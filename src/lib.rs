@@ -1,5 +1,9 @@
-pub mod guard;
-pub mod source;
-pub mod token;
+mod guard;
+mod source;
+mod token;
+
+pub use crate::guard::*;
+pub use crate::source::*;
+pub use crate::token::*;
 
 pub const CANCEL_PANIC_MSG: &'static str = "requested cancellation";
