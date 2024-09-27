@@ -39,7 +39,7 @@ impl CancellationToken {
     pub fn drop_guard_with_source(&self) -> TokenDropGuard {
         TokenDropGuard {
             main: self.clone(),
-            cancel_source: false,
+            cancel_source: true,
             flag: true,
             _marker: PhantomData,
         }
