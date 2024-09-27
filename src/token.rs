@@ -9,7 +9,8 @@ use crate::CANCEL_PANIC_MSG;
 
 #[derive(Debug, Clone)]
 pub struct CancellationToken {
-    flag: Arc<AtomicBool>,
+    pub(crate) flag: Arc<AtomicBool>,
+    pub(crate) source: Option<Arc<AtomicBool>>,
 }
 
 impl Default for CancellationToken {
@@ -22,6 +23,7 @@ impl CancellationToken {
     pub fn new() -> Self {
         Self {
             flag: Arc::new(AtomicBool::new(false)),
+            source: None,
         }
     }
 
@@ -33,20 +35,35 @@ impl CancellationToken {
         }
     }
 
+    #[inline]
     pub fn cancel(&mut self) {
         self.flag.store(true, Ordering::SeqCst);
     }
 
+    #[inline]
     pub fn is_cancelled(&self) -> bool {
         self.flag.load(Ordering::Relaxed)
     }
 
+    #[inline]
+    pub fn cancel_source(&self) -> bool {
+        match &self.source {
+            Some(var) => {
+                var.store(true, Ordering::SeqCst);
+                true
+            }
+            None => false,
+        }
+    }
+
+    #[inline]
     pub fn panic_if_cancelled(&self) {
         if self.is_cancelled() {
             panic!("{CANCEL_PANIC_MSG}")
         }
     }
 
+    #[inline]
     pub fn cancel_and_panic(&mut self) -> ! {
         self.cancel();
         self.panic_if_cancelled();
