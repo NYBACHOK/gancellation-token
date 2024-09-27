@@ -12,6 +12,12 @@ pub struct CancellationToken {
     flag: Arc<AtomicBool>,
 }
 
+impl Default for CancellationToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CancellationToken {
     pub fn new() -> Self {
         Self {

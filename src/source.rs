@@ -16,6 +16,12 @@ impl Drop for CancellationSource {
     }
 }
 
+impl Default for CancellationSource {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CancellationSource {
     pub fn new() -> Self {
         Self {
