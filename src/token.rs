@@ -29,7 +29,17 @@ impl CancellationToken {
 
     pub fn drop_guard(&self) -> TokenDropGuard {
         TokenDropGuard {
-            other_flag: Arc::clone(&self.flag),
+            main: self.clone(),
+            cancel_source: false,
+            flag: true,
+            _marker: PhantomData,
+        }
+    }
+
+    pub fn drop_guard_with_source(&self) -> TokenDropGuard {
+        TokenDropGuard {
+            main: self.clone(),
+            cancel_source: false,
             flag: true,
             _marker: PhantomData,
         }
@@ -42,7 +52,13 @@ impl CancellationToken {
 
     #[inline]
     pub fn is_cancelled(&self) -> bool {
-        self.flag.load(Ordering::Relaxed)
+        match &self.source {
+            Some(var) => match var.load(Ordering::Relaxed) {
+                true => true,
+                false => self.flag.load(Ordering::Relaxed),
+            },
+            None => self.flag.load(Ordering::Relaxed),
+        }
     }
 
     #[inline]
